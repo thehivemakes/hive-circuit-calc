@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voltage Divider Calculator — CircuitCalc</title>
+<meta name="description" content="Voltage divider calculator. Enter Vin, R1, R2 to find Vout, or enter Vout to find resistor values. Free electronics tool.">
+<meta property="og:title" content="Voltage Divider Calculator — CircuitCalc">
+<meta property="og:description" content="Voltage divider calculator. Enter Vin, R1, R2 to find Vout, or enter Vout to find resistor values. Free electronics tool.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thehivemakes.github.io/hive-circuit-calc/voltage-divider.html">
+<link rel="stylesheet" href="style.css">
+<script src="js/calc-core.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Voltage Divider Calculator",
+  "url": "https://thehivemakes.github.io/hive-circuit-calc/voltage-divider.html",
+  "description": "Voltage divider calculator. Enter Vin, R1, R2 to find Vout, or enter Vout to find resistor values. Free electronics tool.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any"
+}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo">Circuit<span>Calc</span></div><div class="tagline">Free electronics calculators</div></div></header>
+<nav><div class="nav-inner"><a href="index.html">CircuitCalc</a><span class="sep">/</span><span>Voltage Divider Calculator</span></div></nav>
+<main>
+  <div class="ad-leaderboard" id="ad-top">Ad</div>
+  <div class="card">
+    <h1>Voltage Divider Calculator</h1>
+    <p class="subtitle">Find Vout, R1, or R2 for a resistive voltage divider.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="vin">Input voltage (V)</label>
+        <input type="number" id="vin" step="0.1" placeholder="12">
+      </div>
+      <div class="field">
+        <label for="r1">R1 (Ω)</label>
+        <input type="number" id="r1" step="1" placeholder="10000">
+      </div>
+      <div class="field">
+        <label for="r2">R2 (Ω)</label>
+        <input type="number" id="r2" step="1" placeholder="10000">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <div class="result" id="result">
+      <div class="result-row">
+        <span class="result-label">Output voltage (Vout)</span>
+        <span class="result-value" id="vout">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Division ratio</span>
+        <span class="result-value" id="ratio">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Current through divider</span>
+        <span class="result-value" id="i-total">—</span>
+      </div>
+      <div class="result-note">Vout = Vin × R2 / (R1 + R2). The output is taken across R2 (the bottom resistor).</div>
+    </div>
+  </div>
+
+  <div class="ad-rectangle" id="ad-mid">Ad</div>
+  <div class="seo-section">
+    <h2>How Voltage Dividers Work</h2>
+    <p>A voltage divider uses two resistors in series to produce an output voltage that is a fraction of the input voltage. The formula is Vout = Vin × R2 / (R1 + R2).</p>
+    <p>Voltage dividers are used in sensor circuits, ADC reference inputs, level shifters, and biasing circuits. They work best when the load impedance is much higher than R2.</p>
+    <p>For a 50/50 split, use equal resistors. For a 1/3 split, use R1 = 2 × R2. Common values range from 1kΩ to 100kΩ depending on power constraints.</p>
+  </div>
+</main>
+<footer>Free electronics calculators. No signup, no tracking. Always verify with a multimeter.<br>Built by <a href="https://thehivemakes.github.io/" style="color:var(--accent)">The Hive</a></footer>
+<script>
+
+function calculate() {
+  const vin = CalcCore.get('vin');
+  const r1 = CalcCore.get('r1');
+  const r2 = CalcCore.get('r2');
+  if (isNaN(vin) || isNaN(r1) || isNaN(r2) || r1+r2 <= 0) return;
+
+  const vout = vin * r2 / (r1 + r2);
+  const ratio = r2 / (r1 + r2);
+  const iTotal = vin / (r1 + r2);
+
+  CalcCore.set('vout', CalcCore.fmt(vout, 3) + ' V');
+  CalcCore.set('ratio', CalcCore.fmt(ratio, 4));
+  let iStr;
+  if (iTotal >= 1) iStr = CalcCore.fmt(iTotal, 3) + ' A';
+  else if (iTotal >= 0.001) iStr = CalcCore.fmt(iTotal*1000, 2) + ' mA';
+  else iStr = CalcCore.fmt(iTotal*1000000, 1) + ' \u03bcA';
+  CalcCore.set('i-total', iStr);
+  CalcCore.showResult();
+  CalcCore.saveParams(['vin','r1','r2']);
+}
+
+function clearAll() {
+  ["vin", "r1", "r2"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.defaultValue || '';
+  });
+  document.getElementById('result').classList.remove('visible');
+  history.replaceState(null, '', window.location.pathname);
+}
+
+document.addEventListener('DOMContentLoaded', () => { if (window.location.search) calculate(); });
+</script>
+</body>
+</html>

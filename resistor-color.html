@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resistor Color Code Calculator — CircuitCalc</title>
+<meta name="description" content="Resistor color code calculator. Decode 4-band and 5-band resistor colors to find resistance value. Free, visual, instant.">
+<meta property="og:title" content="Resistor Color Code Calculator — CircuitCalc">
+<meta property="og:description" content="Resistor color code calculator. Decode 4-band and 5-band resistor colors to find resistance value. Free, visual, instant.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thehivemakes.github.io/hive-circuit-calc/resistor-color.html">
+<link rel="stylesheet" href="style.css">
+<script src="js/calc-core.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Resistor Color Code Calculator",
+  "url": "https://thehivemakes.github.io/hive-circuit-calc/resistor-color.html",
+  "description": "Resistor color code calculator. Decode 4-band and 5-band resistor colors to find resistance value. Free, visual, instant.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any"
+}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo">Circuit<span>Calc</span></div><div class="tagline">Free electronics calculators</div></div></header>
+<nav><div class="nav-inner"><a href="index.html">CircuitCalc</a><span class="sep">/</span><span>Resistor Color Code Calculator</span></div></nav>
+<main>
+  <div class="ad-leaderboard" id="ad-top">Ad</div>
+  <div class="card">
+    <h1>Resistor Color Code Calculator</h1>
+    <p class="subtitle">Select band colors to decode resistor value, or enter a value to find the color code.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="band1">Band 1 (1st digit)</label>
+        <select id="band1"><option value="0">Black (0)</option><option value="1">Brown (1)</option><option value="2">Red (2)</option><option value="3">Orange (3)</option><option value="4">Yellow (4)</option><option value="5">Green (5)</option><option value="6">Blue (6)</option><option value="7">Violet (7)</option><option value="8">Grey (8)</option><option value="9">White (9)</option></select>
+      </div>
+      <div class="field">
+        <label for="band2">Band 2 (2nd digit)</label>
+        <select id="band2"><option value="0">Black (0)</option><option value="1">Brown (1)</option><option value="2">Red (2)</option><option value="3">Orange (3)</option><option value="4">Yellow (4)</option><option value="5">Green (5)</option><option value="6">Blue (6)</option><option value="7">Violet (7)</option><option value="8">Grey (8)</option><option value="9">White (9)</option></select>
+      </div>
+      <div class="field">
+        <label for="multiplier">Band 3 (Multiplier)</label>
+        <select id="multiplier"><option value="1">Black (×1)</option><option value="10">Brown (×10)</option><option value="100">Red (×100)</option><option value="1000">Orange (×1K)</option><option value="10000">Yellow (×10K)</option><option value="100000">Green (×100K)</option><option value="1000000">Blue (×1M)</option><option value="0.1">Gold (×0.1)</option><option value="0.01">Silver (×0.01)</option></select>
+      </div>
+      <div class="field">
+        <label for="tolerance">Band 4 (Tolerance)</label>
+        <select id="tolerance"><option value="1">Brown (±1%)</option><option value="2">Red (±2%)</option><option value="5">Gold (±5%)</option><option value="10">Silver (±10%)</option><option value="20">None (±20%)</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <div class="result" id="result">
+      <div class="result-row">
+        <span class="result-label">Resistance</span>
+        <span class="result-value" id="res-value">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Tolerance</span>
+        <span class="result-value" id="res-tol">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Actual range</span>
+        <span class="result-value" id="res-range">—</span>
+      </div>
+      <div class="result-note">Read bands left to right with the tolerance band (gold/silver) on the right. For 5-band resistors, the first three bands are digits.</div>
+    </div>
+  </div>
+
+  <div class="ad-rectangle" id="ad-mid">Ad</div>
+  <div class="seo-section">
+    <h2>How to Read Resistor Color Codes</h2>
+    <p>Resistor color codes use colored bands to indicate resistance value and tolerance. A standard 4-band resistor has two digit bands, a multiplier band, and a tolerance band.</p>
+    <p>The first two bands represent the first two digits of the resistance value. The third band is the multiplier (number of zeros to add). The fourth band indicates tolerance.</p>
+    <p>Gold tolerance (±5%) and brown tolerance (±1%) are the most common. When in doubt, orient the resistor so the gold or silver band is on the right side.</p>
+  </div>
+</main>
+<footer>Free electronics calculators. No signup, no tracking. Always verify with a multimeter.<br>Built by <a href="https://thehivemakes.github.io/" style="color:var(--accent)">The Hive</a></footer>
+<script>
+
+function calculate() {
+  const b1 = parseInt(CalcCore.getSelect('band1'));
+  const b2 = parseInt(CalcCore.getSelect('band2'));
+  const mult = parseFloat(CalcCore.getSelect('multiplier'));
+  const tol = parseFloat(CalcCore.getSelect('tolerance'));
+
+  const value = (b1 * 10 + b2) * mult;
+  let display;
+  if (value >= 1000000) display = CalcCore.fmt(value/1000000, 2) + ' M\u03a9';
+  else if (value >= 1000) display = CalcCore.fmt(value/1000, 2) + ' k\u03a9';
+  else display = CalcCore.fmt(value, 2) + ' \u03a9';
+
+  const lo = value * (1 - tol/100);
+  const hi = value * (1 + tol/100);
+  let rangeStr;
+  if (value >= 1000) rangeStr = CalcCore.fmt(lo/1000,1) + ' \u2013 ' + CalcCore.fmt(hi/1000,1) + ' k\u03a9';
+  else rangeStr = CalcCore.fmt(lo,1) + ' \u2013 ' + CalcCore.fmt(hi,1) + ' \u03a9';
+
+  CalcCore.set('res-value', display);
+  CalcCore.set('res-tol', '\u00b1' + tol + '%');
+  CalcCore.set('res-range', rangeStr);
+  CalcCore.showResult();
+  CalcCore.saveParams(['band1','band2','multiplier','tolerance']);
+}
+
+function clearAll() {
+  ["band1", "band2", "multiplier", "tolerance"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.defaultValue || '';
+  });
+  document.getElementById('result').classList.remove('visible');
+  history.replaceState(null, '', window.location.pathname);
+}
+
+document.addEventListener('DOMContentLoaded', () => { if (window.location.search) calculate(); });
+</script>
+</body>
+</html>

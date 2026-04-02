@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LED Resistor Calculator — CircuitCalc</title>
+<meta name="description" content="LED resistor calculator. Enter supply voltage, LED forward voltage, and desired current to find the right resistor. Free, instant.">
+<meta property="og:title" content="LED Resistor Calculator — CircuitCalc">
+<meta property="og:description" content="LED resistor calculator. Enter supply voltage, LED forward voltage, and desired current to find the right resistor. Free, instant.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thehivemakes.github.io/hive-circuit-calc/led-resistor.html">
+<link rel="stylesheet" href="style.css">
+<script src="js/calc-core.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "LED Resistor Calculator",
+  "url": "https://thehivemakes.github.io/hive-circuit-calc/led-resistor.html",
+  "description": "LED resistor calculator. Enter supply voltage, LED forward voltage, and desired current to find the right resistor. Free, instant.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any"
+}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo">Circuit<span>Calc</span></div><div class="tagline">Free electronics calculators</div></div></header>
+<nav><div class="nav-inner"><a href="index.html">CircuitCalc</a><span class="sep">/</span><span>LED Resistor Calculator</span></div></nav>
+<main>
+  <div class="ad-leaderboard" id="ad-top">Ad</div>
+  <div class="card">
+    <h1>LED Resistor Calculator</h1>
+    <p class="subtitle">Calculate the current-limiting resistor value for an LED circuit.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="vsupply">Supply voltage (V)</label>
+        <input type="number" id="vsupply" step="0.1" placeholder="5" value="5">
+      </div>
+      <div class="field">
+        <label for="vled">LED forward voltage (V)</label>
+        <input type="number" id="vled" step="0.1" placeholder="2.0" value="2.0">
+      </div>
+      <div class="field">
+        <label for="iled">LED current (mA)</label>
+        <input type="number" id="iled" min="0.1" step="0.1" placeholder="20" value="20">
+      </div>
+      <div class="field">
+        <label for="numled">LEDs in series</label>
+        <input type="number" id="numled" min="1" step="1" placeholder="1" value="1">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <div class="result" id="result">
+      <div class="result-row">
+        <span class="result-label">Resistor value</span>
+        <span class="result-value" id="res-val">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Nearest standard value (E24)</span>
+        <span class="result-value" id="res-std">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Power dissipated in resistor</span>
+        <span class="result-value" id="res-power">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Recommended resistor wattage</span>
+        <span class="result-value" id="res-watt">—</span>
+      </div>
+      <div class="result-note">R = (Vsupply − (Vled × N)) / Iled. Always use a resistor with a wattage rating at least 2× the calculated power dissipation.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:12px;">Common LED Forward Voltages</h2>
+    <table class="ref-table" id="ref-table">
+      <thead><tr><th>LED Color</th><th>Forward Voltage</th><th>Typical Current</th></tr></thead>
+      <tbody>
+        <tr><td>Red</td><td>1.8–2.2V</td><td>20mA</td></tr>
+        <tr><td>Orange</td><td>2.0–2.2V</td><td>20mA</td></tr>
+        <tr><td>Yellow</td><td>2.0–2.2V</td><td>20mA</td></tr>
+        <tr><td>Green</td><td>2.0–3.0V</td><td>20mA</td></tr>
+        <tr><td>Blue</td><td>3.0–3.4V</td><td>20mA</td></tr>
+        <tr><td>White</td><td>3.0–3.4V</td><td>20mA</td></tr>
+        <tr><td>UV</td><td>3.1–3.5V</td><td>20mA</td></tr>
+        <tr><td>Infrared</td><td>1.2–1.6V</td><td>20–50mA</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ad-rectangle" id="ad-mid">Ad</div>
+  <div class="seo-section">
+    <h2>How to Size an LED Resistor</h2>
+    <p>LEDs require a current-limiting resistor to prevent them from burning out. Without one, an LED will draw excessive current and fail almost instantly.</p>
+    <p>The formula is simple: R = (Vsupply − Vled) / Iled. For multiple LEDs in series, subtract the total LED voltage drop: R = (Vsupply − N × Vled) / Iled.</p>
+    <p>Always choose a standard resistor value equal to or greater than the calculated value. A slightly higher resistance means slightly less current and brightness, which is always safer than too little resistance.</p>
+    <p>Check the power dissipation: P = (Vsupply − Vled) × Iled. Use a resistor rated for at least twice this power to ensure long life.</p>
+  </div>
+</main>
+<footer>Free electronics calculators. No signup, no tracking. Always verify with a multimeter.<br>Built by <a href="https://thehivemakes.github.io/" style="color:var(--accent)">The Hive</a></footer>
+<script>
+
+const E24 = [1.0,1.1,1.2,1.3,1.5,1.6,1.8,2.0,2.2,2.4,2.7,3.0,3.3,3.6,3.9,4.3,4.7,5.1,5.6,6.2,6.8,7.5,8.2,9.1];
+
+function nearestE24(val) {
+  if (val <= 0) return 0;
+  const decade = Math.pow(10, Math.floor(Math.log10(val)));
+  const normalized = val / decade;
+  let best = E24[0];
+  for (const e of E24) { if (e >= normalized) { best = e; break; } }
+  if (best < normalized) best = E24[0] * 10;
+  return best * decade;
+}
+
+function calculate() {
+  const vs = CalcCore.get('vsupply');
+  const vl = CalcCore.get('vled');
+  const il = CalcCore.get('iled') / 1000;
+  const n = CalcCore.get('numled') || 1;
+
+  if (isNaN(vs) || isNaN(vl) || isNaN(il) || il <= 0) return;
+  const vdrop = vs - (vl * n);
+  if (vdrop <= 0) {
+    CalcCore.set('res-val', 'Supply voltage too low!');
+    CalcCore.set('res-std', '\u2014');
+    CalcCore.set('res-power', '\u2014');
+    CalcCore.set('res-watt', '\u2014');
+    CalcCore.showResult();
+    return;
+  }
+
+  const r = vdrop / il;
+  const rStd = nearestE24(r);
+  const pwr = vdrop * il;
+  const watt = pwr < 0.125 ? '1/8W' : pwr < 0.25 ? '1/4W' : pwr < 0.5 ? '1/2W' : '1W+';
+
+  CalcCore.set('res-val', CalcCore.fmt(r, 1) + ' \u03a9');
+  CalcCore.set('res-std', CalcCore.fmt(rStd, 0) + ' \u03a9');
+  CalcCore.set('res-power', CalcCore.fmt(pwr * 1000, 1) + ' mW');
+  CalcCore.set('res-watt', watt + ' (use 2\u00d7 for safety)');
+  CalcCore.showResult();
+  CalcCore.saveParams(['vsupply','vled','iled','numled']);
+}
+
+function clearAll() {
+  ["vsupply", "vled", "iled", "numled"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.defaultValue || '';
+  });
+  document.getElementById('result').classList.remove('visible');
+  history.replaceState(null, '', window.location.pathname);
+}
+
+document.addEventListener('DOMContentLoaded', () => { if (window.location.search) calculate(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RC Time Constant Calculator — CircuitCalc</title>
+<meta name="description" content="RC time constant calculator. Find tau, charge/discharge time, and cutoff frequency for any RC circuit. Free electronics tool.">
+<meta property="og:title" content="RC Time Constant Calculator — CircuitCalc">
+<meta property="og:description" content="RC time constant calculator. Find tau, charge/discharge time, and cutoff frequency for any RC circuit. Free electronics tool.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thehivemakes.github.io/hive-circuit-calc/rc-time.html">
+<link rel="stylesheet" href="style.css">
+<script src="js/calc-core.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "RC Time Constant Calculator",
+  "url": "https://thehivemakes.github.io/hive-circuit-calc/rc-time.html",
+  "description": "RC time constant calculator. Find tau, charge/discharge time, and cutoff frequency for any RC circuit. Free electronics tool.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any"
+}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo">Circuit<span>Calc</span></div><div class="tagline">Free electronics calculators</div></div></header>
+<nav><div class="nav-inner"><a href="index.html">CircuitCalc</a><span class="sep">/</span><span>RC Time Constant Calculator</span></div></nav>
+<main>
+  <div class="ad-leaderboard" id="ad-top">Ad</div>
+  <div class="card">
+    <h1>RC Time Constant Calculator</h1>
+    <p class="subtitle">Enter resistance and capacitance to find the RC time constant and related values.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="resistance_rc">Resistance</label>
+        <input type="number" id="resistance_rc" step="1" placeholder="10000">
+      </div>
+      <div class="field">
+        <label for="r_unit">R unit</label>
+        <select id="r_unit"><option value="1">Ohms (Ω)</option><option value="1000">kΩ</option><option value="1000000">MΩ</option></select>
+      </div>
+      <div class="field">
+        <label for="capacitance">Capacitance</label>
+        <input type="number" id="capacitance" step="0.1" placeholder="10">
+      </div>
+      <div class="field">
+        <label for="c_unit">C unit</label>
+        <select id="c_unit"><option value="0.000001">\u03bcF</option><option value="0.000000001">nF</option><option value="0.000000000001">pF</option></select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <div class="result" id="result">
+      <div class="result-row">
+        <span class="result-label">Time constant (\u03c4)</span>
+        <span class="result-value" id="tau">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Time to 63.2% (1\u03c4)</span>
+        <span class="result-value" id="charge63">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Time to 99.3% (5\u03c4)</span>
+        <span class="result-value" id="charge99">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Cutoff frequency (-3dB)</span>
+        <span class="result-value" id="cutoff">—</span>
+      </div>
+      <div class="result-note">\u03c4 = R \u00d7 C. The capacitor reaches 63.2% charge in 1\u03c4, 86.5% in 2\u03c4, 95.0% in 3\u03c4, 98.2% in 4\u03c4, and 99.3% in 5\u03c4. Cutoff frequency fc = 1 / (2\u03c0RC).</div>
+    </div>
+  </div>
+
+  <div class="ad-rectangle" id="ad-mid">Ad</div>
+  <div class="seo-section">
+    <h2>Understanding RC Time Constants</h2>
+    <p>An RC circuit combines a resistor and capacitor. The time constant \u03c4 (tau) equals R \u00d7 C and determines how quickly the capacitor charges or discharges.</p>
+    <p>In one time constant, a capacitor charges to 63.2% of the applied voltage. It takes approximately 5 time constants to reach 99.3% (considered fully charged for most practical purposes).</p>
+    <p>RC circuits are used as filters, timing circuits, and smoothing circuits. The cutoff frequency fc = 1/(2\u03c0RC) defines where the filter attenuates the signal by 3dB.</p>
+  </div>
+</main>
+<footer>Free electronics calculators. No signup, no tracking. Always verify with a multimeter.<br>Built by <a href="https://thehivemakes.github.io/" style="color:var(--accent)">The Hive</a></footer>
+<script>
+
+function calculate() {
+  const r_raw = CalcCore.get('resistance_rc');
+  const r_mult = parseFloat(CalcCore.getSelect('r_unit'));
+  const c_raw = CalcCore.get('capacitance');
+  const c_mult = parseFloat(CalcCore.getSelect('c_unit'));
+
+  if (isNaN(r_raw) || isNaN(c_raw) || r_raw<=0 || c_raw<=0) return;
+  const R = r_raw * r_mult;
+  const C = c_raw * c_mult;
+  const tau = R * C;
+  const fc = 1 / (2 * Math.PI * tau);
+
+  function fmtTime(t) {
+    if (t >= 1) return CalcCore.fmt(t, 3) + ' s';
+    if (t >= 0.001) return CalcCore.fmt(t*1000, 3) + ' ms';
+    if (t >= 0.000001) return CalcCore.fmt(t*1000000, 3) + ' \u03bcs';
+    return CalcCore.fmt(t*1000000000, 3) + ' ns';
+  }
+  function fmtFreq(f) {
+    if (f >= 1000000) return CalcCore.fmt(f/1000000, 2) + ' MHz';
+    if (f >= 1000) return CalcCore.fmt(f/1000, 2) + ' kHz';
+    return CalcCore.fmt(f, 2) + ' Hz';
+  }
+
+  CalcCore.set('tau', fmtTime(tau));
+  CalcCore.set('charge63', fmtTime(tau));
+  CalcCore.set('charge99', fmtTime(tau * 5));
+  CalcCore.set('cutoff', fmtFreq(fc));
+  CalcCore.showResult();
+  CalcCore.saveParams(['resistance_rc','r_unit','capacitance','c_unit']);
+}
+
+function clearAll() {
+  ["resistance_rc", "r_unit", "capacitance", "c_unit"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.defaultValue || '';
+  });
+  document.getElementById('result').classList.remove('visible');
+  history.replaceState(null, '', window.location.pathname);
+}
+
+document.addEventListener('DOMContentLoaded', () => { if (window.location.search) calculate(); });
+</script>
+</body>
+</html>

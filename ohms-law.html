@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohm's Law Calculator — CircuitCalc</title>
+<meta name="description" content="Ohm's law calculator. Enter any two values (voltage, current, resistance, power) to find the rest. Free, instant, works on mobile.">
+<meta property="og:title" content="Ohm's Law Calculator — CircuitCalc">
+<meta property="og:description" content="Ohm's law calculator. Enter any two values (voltage, current, resistance, power) to find the rest. Free, instant, works on mobile.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thehivemakes.github.io/hive-circuit-calc/ohms-law.html">
+<link rel="stylesheet" href="style.css">
+<script src="js/calc-core.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Ohm's Law Calculator",
+  "url": "https://thehivemakes.github.io/hive-circuit-calc/ohms-law.html",
+  "description": "Ohm's law calculator. Enter any two values (voltage, current, resistance, power) to find the rest. Free, instant, works on mobile.",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any"
+}
+</script>
+</head>
+<body>
+<header><div class="header-inner"><div class="logo">Circuit<span>Calc</span></div><div class="tagline">Free electronics calculators</div></div></header>
+<nav><div class="nav-inner"><a href="index.html">CircuitCalc</a><span class="sep">/</span><span>Ohm's Law Calculator</span></div></nav>
+<main>
+  <div class="ad-leaderboard" id="ad-top">Ad</div>
+  <div class="card">
+    <h1>Ohm's Law Calculator</h1>
+    <p class="subtitle">Enter any two of voltage, current, resistance, or power to calculate the other two.</p>
+    <div class="form-grid">
+      <div class="field">
+        <label for="voltage">Voltage (V)</label>
+        <input type="number" id="voltage" step="0.01" placeholder="12">
+      </div>
+      <div class="field">
+        <label for="current">Current (A)</label>
+        <input type="number" id="current" step="0.001" placeholder="0.02">
+      </div>
+      <div class="field">
+        <label for="resistance">Resistance (Ω)</label>
+        <input type="number" id="resistance" step="0.1" placeholder="">
+      </div>
+      <div class="field">
+        <label for="power">Power (W)</label>
+        <input type="number" id="power" step="0.001" placeholder="">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+    <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+    <div class="result" id="result">
+      <div class="result-row">
+        <span class="result-label">Voltage (V)</span>
+        <span class="result-value" id="out-v">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Current (A)</span>
+        <span class="result-value" id="out-i">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Resistance (Ω)</span>
+        <span class="result-value" id="out-r">—</span>
+      </div>
+      <div class="result-row">
+        <span class="result-label">Power (W)</span>
+        <span class="result-value" id="out-p">—</span>
+      </div>
+      <div class="result-note">V = I × R | P = V × I = I²R = V²/R. Enter any two known values; the other two will be calculated.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h2 style="font-size:16px;font-weight:700;margin-bottom:12px;">Common Values</h2>
+    <table class="ref-table" id="ref-table">
+      <thead><tr><th>Component</th><th>Typical Voltage</th><th>Typical Current</th></tr></thead>
+      <tbody>
+        <tr><td>USB port</td><td>5V</td><td>0.5–2A</td></tr>
+        <tr><td>AA battery</td><td>1.5V</td><td>0.5–3A max</td></tr>
+        <tr><td>Car battery</td><td>12.6V</td><td>200–600A (cranking)</td></tr>
+        <tr><td>Standard LED</td><td>1.8–3.3V</td><td>20mA</td></tr>
+        <tr><td>Arduino GPIO</td><td>5V / 3.3V</td><td>20–40mA max</td></tr>
+        <tr><td>US wall outlet</td><td>120V AC</td><td>15–20A circuit</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ad-rectangle" id="ad-mid">Ad</div>
+  <div class="seo-section">
+    <h2>Understanding Ohm's Law</h2>
+    <p>Ohm's law is the foundation of electrical engineering. It describes the relationship between voltage (V), current (I), and resistance (R): V = I × R.</p>
+    <p>Power can be derived from any two of these values: P = V × I = I²R = V²/R. This calculator lets you enter any two known values and computes the remaining two.</p>
+    <p>This relationship holds for resistive (ohmic) loads. For reactive components like capacitors and inductors in AC circuits, impedance replaces resistance.</p>
+  </div>
+</main>
+<footer>Free electronics calculators. No signup, no tracking. Always verify with a multimeter.<br>Built by <a href="https://thehivemakes.github.io/" style="color:var(--accent)">The Hive</a></footer>
+<script>
+
+function calculate() {
+  const v = CalcCore.get('voltage');
+  const i = CalcCore.get('current');
+  const r = CalcCore.get('resistance');
+  const p = CalcCore.get('power');
+
+  let V, I, R, P;
+  const known = [!isNaN(v), !isNaN(i), !isNaN(r), !isNaN(p)].filter(Boolean).length;
+  if (known < 2) return;
+
+  if (!isNaN(v) && !isNaN(i)) { V=v; I=i; R=v/i; P=v*i; }
+  else if (!isNaN(v) && !isNaN(r)) { V=v; R=r; I=v/r; P=v*v/r; }
+  else if (!isNaN(v) && !isNaN(p)) { V=v; P=p; I=p/v; R=v*v/p; }
+  else if (!isNaN(i) && !isNaN(r)) { I=i; R=r; V=i*r; P=i*i*r; }
+  else if (!isNaN(i) && !isNaN(p)) { I=i; P=p; V=p/i; R=p/(i*i); }
+  else if (!isNaN(r) && !isNaN(p)) { R=r; P=p; V=Math.sqrt(p*r); I=Math.sqrt(p/r); }
+  else return;
+
+  CalcCore.set('out-v', CalcCore.fmt(V, 4) + ' V');
+  CalcCore.set('out-i', CalcCore.fmt(I, 4) + ' A');
+  CalcCore.set('out-r', CalcCore.fmt(R, 2) + ' \u03a9');
+  CalcCore.set('out-p', CalcCore.fmt(P, 4) + ' W');
+  CalcCore.showResult();
+  CalcCore.saveParams(['voltage','current','resistance','power']);
+}
+
+function clearAll() {
+  ["voltage", "current", "resistance", "power"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = el.defaultValue || '';
+  });
+  document.getElementById('result').classList.remove('visible');
+  history.replaceState(null, '', window.location.pathname);
+}
+
+document.addEventListener('DOMContentLoaded', () => { if (window.location.search) calculate(); });
+</script>
+</body>
+</html>
